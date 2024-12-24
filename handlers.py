@@ -52,8 +52,8 @@ async def start(message: types.Message | types.CallbackQuery,
                 text_msg: str = None):
     is_callback = isinstance(message, types.CallbackQuery)
 
-    data = await state.get_data()
-    main_menu_msg: tuple[str,str] = data.get('main_menu_msg')
+    # data = await state.get_data()
+    # main_menu_msg: tuple[str,str] = data.get('main_menu_msg')
 
     # if main_menu_msg:
     #     try:
@@ -129,6 +129,8 @@ async def start(message: types.Message | types.CallbackQuery,
 
     # text_msg = text_msg if text_msg else 'Главное меню'
     if not main_menu_msg or not is_callback:
+        await bot.set_my_description(description='test22',
+                                     language_code='ru')
         main_menu_msg: types.Message = await message.answer(start_text,
                                                             reply_markup=start_kb.as_markup(),
                                                             disable_web_page_preview=True,
@@ -145,9 +147,9 @@ async def start(message: types.Message | types.CallbackQuery,
                                             message_id=message_id,
                                             reply_markup=start_kb.as_markup())
 
-    msg_data = (main_menu_msg.chat.id, main_menu_msg.message_id)
+    # msg_data = (main_menu_msg.chat.id, main_menu_msg.message_id)
 
-    await state.update_data(main_menu_msg=msg_data)
+    # await state.update_data(main_menu_msg=msg_data)
     
     # if main_menu_msg:
     #     try:
