@@ -237,6 +237,9 @@ async def test_send(user_id: int,
             select(
                 FeedbackForm
             )\
+            .where(
+                FeedbackForm.id == order_id,
+            )
             .order_by(FeedbackForm.time_create.asc())\
         )
         with session as session:
