@@ -265,7 +265,7 @@ async def test_send(user_id: int,
 
         hidden_orders_count = len(res) - _limit
 
-        if hidden_orders_count:
+        if hidden_orders_count > 0:
             msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
 
 
