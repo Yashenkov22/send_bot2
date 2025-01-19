@@ -249,7 +249,7 @@ async def test_send(user_id: int,
         
         # msg_text += '\n<b>Формы обратной связи, ожидающие модерации:</b>\n'
         print(res, len(res))
-        msg_text = '<b>Новая заявка Swift/Sepa, ожидающая модерации:</b>\n'
+        msg_text = '<b>Новая заявка Форма обратной связи, ожидающая внимания:</b>\n'
 
         for idx, el in enumerate(res[:_limit], start=1):
             time_create = el.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
