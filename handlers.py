@@ -248,6 +248,7 @@ async def test_send(user_id: int,
             res = res.scalars().all()
         
         # msg_text += '\n<b>Формы обратной связи, ожидающие модерации:</b>\n'
+        print(res, len(res))
         msg_text = '<b>Новая заявка Swift/Sepa, ожидающая модерации:</b>\n'
 
         for idx, el in enumerate(res[:_limit], start=1):
