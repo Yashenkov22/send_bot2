@@ -276,6 +276,23 @@ async def test_send(user_id: int,
 
 
 
+
+async def test_send_info(execute_time,
+                    start_users_count: int,
+                    end_users_count: int,
+                    session: Session,
+                    bot: Bot):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    msg_text = f'Массовая рассылка завершена\n\nВремя выполнения: {execute_time}\n\nНачальное число активных пользователей: {start_users_count}\n\Конечное число активных пользователей: {end_users_count}'
+
+    await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                           text=msg_text,
+                           disable_web_page_preview=True)
+
+
+
+
 @main_router.message(Command('test'))
 async def test(message: types.Message | types.CallbackQuery,
                 session: Session,
