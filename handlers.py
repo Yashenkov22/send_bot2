@@ -268,10 +268,13 @@ async def test_send(user_id: int,
         if hidden_orders_count > 0:
             msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
 
-
-    await bot.send_message(chat_id=MODER_CHANNEL_ID,
-                           text=msg_text,
-                           disable_web_page_preview=True)
+    try:
+        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                               text=msg_text,
+                               disable_web_page_preview=True)
+    except Exception as ex:
+        print('Ошибка при отправке уведолмения в бота уведолмений')
+        print(ex)
 
 
 
