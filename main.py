@@ -32,7 +32,11 @@ from config import (TOKEN,
                     API_HASH,
                     REDIS_HOST,
                     REDIS_PASSWORD)
-from handlers import main_router, send_mass_message, test_send, test_send_info
+from handlers import (main_router,
+                      send_mass_message,
+                      test_send,
+                      test_send_info,
+                      result_chat_link)
 
 
 ###DEV###
@@ -122,6 +126,11 @@ async def send_to_tg_group(user_id: int,
                     session=session(),
                     bot=bot)
 
+
+@app.get('/send_result_chat_link')
+async def send_to_tg_group(result_text: str):
+    await result_chat_link(result_text,
+                           bot=bot)
 
 
 @app.get('/send_mass_message_info')
