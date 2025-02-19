@@ -128,7 +128,7 @@ async def send_to_tg_group(user_id: int,
 
 
 @app.get('/send_result_chat_link')
-async def send_to_tg_group(result_text: str):
+async def send_result_chat_link(result_text: str):
     await result_chat_link(result_text,
                            bot=bot)
 
