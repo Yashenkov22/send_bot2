@@ -279,6 +279,19 @@ async def test_send(user_id: int,
 
 async def result_chat_link(result_text: str,
                            bot: Bot):
+    # MODER_CHANNEL_ID = '-1002435890346'
+    DEV_ID = 686339126
+
+    try:
+        await bot.send_message(chat_id=DEV_ID,
+                               text=result_text)
+    except Exception as ex:
+        print('Ошибка при отправке уведолмения в бота уведолмений')
+        print(ex)
+
+
+async def test_result_chat_link(result_text: str,
+                           bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
 
     try:
