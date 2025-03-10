@@ -296,7 +296,7 @@ async def test_result_chat_link(result_text: str,
     DEV_ID = 686339126
 
     try:
-        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+        await bot.send_message(chat_id=DEV_ID,
                                text=result_text)
     except Exception as ex:
         print('Ошибка при отправке уведолмения в бота уведолмений')
