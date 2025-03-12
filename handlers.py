@@ -172,11 +172,12 @@ async def start(message: types.Message | types.CallbackQuery,
 
 
 @main_router.callback_query(F.data.startswith('swift'))
-async def start(callback: types.CallbackQuery,
+async def swift_confirm(callback: types.CallbackQuery,
                 session: Session,
                 state: FSMContext,
                 bot: Bot,
                 text_msg: str = None):
+    print('inside')
     MODER_CHANNEL_ID = '-1002435890346'
 
     message_text = callback.message.text
