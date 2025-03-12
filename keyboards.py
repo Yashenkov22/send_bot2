@@ -115,3 +115,14 @@ def create_kb_to_main():
                                       callback_data='send_app'))
     
     return kb
+
+
+def create_confirm_swift_sepa_kb(order_id: int):
+    _kb = InlineKeyboardBuilder()
+
+    _kb.add(types.InlineKeyboardButton(text='Принять в работу',
+                                      callback_data=f'swift_agree_{order_id}'))
+    _kb.add(types.InlineKeyboardButton(text='Отклонить заявку',
+                                      callback_data=f'swift_reject_{order_id}'))
+    
+    return _kb

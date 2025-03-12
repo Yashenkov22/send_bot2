@@ -29,7 +29,8 @@ from keyboards import (create_start_keyboard,
                        create_support_kb,
                        create_feedback_form_reasons_kb,
                        reason_dict,
-                       create_feedback_confirm_kb)
+                       create_feedback_confirm_kb,
+                       create_confirm_swift_sepa_kb)
 
 from states import SwiftSepaStates, FeedbackFormStates
 
@@ -170,6 +171,91 @@ async def start(message: types.Message | types.CallbackQuery,
         pass
 
 
+@main_router.callback_query(F.data.startswith('swift'))
+async def start(callback: types.CallbackQuery,
+                session: Session,
+                state: FSMContext,
+                bot: Bot,
+                text_msg: str = None):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    message_text = callback.message.text
+    message_id = callback.message.message_id
+
+    callback_data = callback.data.split('_')
+
+    confirm_marker = callback_data[1]
+
+    order_id = callback_data[-1]
+
+    sub_text = '\n\n Ничего не произошло'
+
+    if confirm_marker == 'agree':
+        CustomOrder = Base.classes.general_models_customorder
+        Guest = Base.classes.general_models_guest
+
+        query = (
+            select(
+                CustomOrder.id,
+                Guest.tg_id,
+            )\
+            .join(Guest,
+                CustomOrder.guest_id == Guest.tg_id)\
+            .where(
+                or_(
+                    CustomOrder.id == order_id,
+                    )
+            )\
+            .order_by(CustomOrder.time_create.asc())\
+        )
+
+        with session as session:
+            res = session.execute(query)
+
+            res = res.fetchall()
+
+        _order_id, _guest_id = res[0]
+
+        _url = f'https://api.moneyswap.online/test_swift_sepa?user_id={_guest_id}&order_id={_order_id}'
+        timeout = aiohttp.ClientTimeout(total=5)
+        async with aiohttp.ClientSession() as _session:
+            async with _session.get(_url,
+                                timeout=timeout) as response:
+                response_json: dict = await response.json()
+            
+        _status = response_json.get('status')
+
+        if _status == 'success':
+            done_query = (
+                update(
+                    CustomOrder
+                )\
+                .values(moderation=True,
+                        status='Завершен')\
+                .where(CustomOrder.id == order_id)
+            )
+            session.execute(done_query)
+
+            try:
+                session.commit()
+            except Exception as ex:
+                session.rollback()
+            else:
+                sub_text = '\n\n<b><i>Заявка принята в работу</i></b>'
+
+    elif confirm_marker == 'reject':
+        sub_text = '\n\n<b><i>Заявка отклонена</i></b>'
+        # pass
+    
+    new_message_text = message_text + sub_text
+
+    await bot.edit_message_text(text=new_message_text,
+                                chat_id=MODER_CHANNEL_ID,
+                                message_id=message_id,
+                                reply_markup=None,
+                                disable_web_page_preview=True)
+
+
 async def test_send(user_id: int,
                     order_id: int,
                     marker: str,
@@ -224,6 +310,16 @@ async def test_send(user_id: int,
             
             msg_text += f'\r{el_form}'
         
+        try:
+            _kb = create_confirm_swift_sepa_kb(order_id)
+
+            await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                                text=msg_text,
+                                reply_markup=_kb.as_markup(),
+                                disable_web_page_preview=True)
+        except Exception as ex:
+            print('Ошибка при отправке уведолмения в бота уведолмений')
+            print(ex)
         # hidden_orders_count = len(res) - _limit
 
         # if hidden_orders_count > 0:
@@ -267,13 +363,13 @@ async def test_send(user_id: int,
         # if hidden_orders_count > 0:
         #     msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
 
-    try:
-        await bot.send_message(chat_id=MODER_CHANNEL_ID,
-                               text=msg_text,
-                               disable_web_page_preview=True)
-    except Exception as ex:
-        print('Ошибка при отправке уведолмения в бота уведолмений')
-        print(ex)
+        try:
+            await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                                text=msg_text,
+                                disable_web_page_preview=True)
+        except Exception as ex:
+            print('Ошибка при отправке уведолмения в бота уведолмений')
+            print(ex)
 
 
 async def result_chat_link(result_text: str,
