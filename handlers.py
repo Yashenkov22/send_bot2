@@ -204,7 +204,7 @@ async def test_send(user_id: int,
 
         # print(res)
 
-        msg_text = '<b>Новая заявка Swift/Sepa, ожидающая модерации:</b>\n'
+        msg_text = '💰<b>Новая заявка Swift/Sepa, ожидающая модерации:</b>\n'
 
         for idx, _tuple in enumerate(res[:_limit], start=1):
             el, guest = _tuple
@@ -212,10 +212,10 @@ async def test_send(user_id: int,
             # print(el.time_create)
             time_create = el.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
             el_form = f'''
-    {idx}
     Время создания: {time_create}\r
     Тип заявки: {el.request_type}\r
     Пользователь: {el.guest_id}\r
+    Комментарий: {el.comment}\r
     Ссылка на заявку в <a href="https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/">django admin</a>
     ''' 
             # print(el.__dict__)
@@ -224,10 +224,10 @@ async def test_send(user_id: int,
             
             msg_text += f'\r{el_form}'
         
-        hidden_orders_count = len(res) - _limit
+        # hidden_orders_count = len(res) - _limit
 
-        if hidden_orders_count > 0:
-            msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
+        # if hidden_orders_count > 0:
+        #     msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
 
     else:
 
@@ -248,13 +248,12 @@ async def test_send(user_id: int,
             res = res.scalars().all()
         
         # msg_text += '\n<b>Формы обратной связи, ожидающие модерации:</b>\n'
-        print(res, len(res))
-        msg_text = '<b>Новая заявка Форма обратной связи, ожидающая внимания:</b>\n'
+        # print(res, len(res))
+        msg_text = '⏳<b>Новая заявка Форма обратной связи, ожидающая внимания:</b>\n'
 
         for idx, el in enumerate(res[:_limit], start=1):
             time_create = el.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
             el_form = f'''
-    {idx}
     Время создания: {time_create}\r
     Тип проблемы: {el.reasons}\r
     Пользователь: {el.username}\r
@@ -263,10 +262,10 @@ async def test_send(user_id: int,
 
             msg_text += f'\r{el_form}'
 
-        hidden_orders_count = len(res) - _limit
+        # hidden_orders_count = len(res) - _limit
 
-        if hidden_orders_count > 0:
-            msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
+        # if hidden_orders_count > 0:
+        #     msg_text += f'\n <b><i>* {hidden_orders_count} элементов не были показаны</i></b>'
 
     try:
         await bot.send_message(chat_id=MODER_CHANNEL_ID,
