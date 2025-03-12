@@ -171,7 +171,7 @@ async def start(message: types.Message | types.CallbackQuery,
         pass
 
 
-@main_router.callback_query(F.data.startswith('swift'))
+@main_router.callback_query()
 async def swift_confirm(callback: types.CallbackQuery,
                 session: Session,
                 state: FSMContext,
