@@ -322,7 +322,7 @@ async def test_send(user_id: int,
     Пользователь: {el.guest_id}\r
     Комментарий: {el.comment}\r
     Ссылка на заявку в django admin👇🏼 \r
-    ( https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/ )
+    https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/
     ''' 
 
             # print(el.__dict__)
