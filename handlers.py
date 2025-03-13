@@ -314,7 +314,7 @@ async def test_send(user_id: int,
             msg_text += f'\r{el_form}'
         
         try:
-            NEW_GROUP_ID = '-4667981929'
+            # NEW_GROUP_ID = '-4667981929'
             
             _kb = create_confirm_swift_sepa_kb(order_id)
             # if guest.tg_id == 686339126:
@@ -324,13 +324,12 @@ async def test_send(user_id: int,
             #                            reply_markup=_kb.as_markup(),
             #                            disable_web_page_preview=True)
             # else:
-            if guest.tg_id == 686339126:
-                _disable_notification = True
-            else:
-                _disable_notification = False
+            # if guest.tg_id == 686339126:
+            #     _disable_notification = True
+            # else:
+            #     _disable_notification = False
             await bot.send_message(chat_id=MODER_CHANNEL_ID,
                                     text=msg_text,
-                                    disable_notification=_disable_notification,
                                     reply_markup=_kb.as_markup(),
                                     disable_web_page_preview=True)
         except Exception as ex:
