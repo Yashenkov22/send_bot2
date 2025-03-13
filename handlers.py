@@ -178,8 +178,8 @@ async def swift_confirm(callback: types.CallbackQuery,
                 bot: Bot,
                 text_msg: str = None):
     print('inside')
-    # MODER_CHANNEL_ID = '-1002435890346'
-    NEW_GROUP_ID = '-4667981929'
+    MODER_CHANNEL_ID = '-1002435890346'
+    # NEW_GROUP_ID = '-4667981929'
 
     message_text = callback.message.text
     message_id = callback.message.message_id
@@ -190,7 +190,7 @@ async def swift_confirm(callback: types.CallbackQuery,
 
     order_id = callback_data[-1]
 
-    sub_text = '\n\n Ничего не произошло'
+    sub_text = '\n\n Ничего не произошло (вероятно пользователь заблокировал бота)😔'
 
     if confirm_marker == 'agree':
         CustomOrder = Base.classes.general_models_customorder
@@ -244,16 +244,16 @@ async def swift_confirm(callback: types.CallbackQuery,
             except Exception as ex:
                 session.rollback()
             else:
-                sub_text = '\n\n<b><i>Заявка принята в работу</i></b>'
+                sub_text = '\n\n<b><i>Заявка принята в работу✅</i></b>'
 
     elif confirm_marker == 'reject':
-        sub_text = '\n\n<b><i>Заявка отклонена</i></b>'
+        sub_text = '\n\n<b><i>Заявка отклонена❌</i></b>'
         # pass
     
     new_message_text = message_text + sub_text
 
     await bot.edit_message_text(text=new_message_text,
-                                chat_id=NEW_GROUP_ID,
+                                chat_id=MODER_CHANNEL_ID,
                                 message_id=message_id,
                                 reply_markup=None,
                                 disable_web_page_preview=True)
@@ -316,17 +316,22 @@ async def test_send(user_id: int,
         try:
             NEW_GROUP_ID = '-4667981929'
             
-            if guest.tg_id == 686339126:
-                _kb = create_confirm_swift_sepa_kb(order_id)
+            # if guest.tg_id == 686339126:
+            #     _kb = create_confirm_swift_sepa_kb(order_id)
 
-                await bot.send_message(chat_id=NEW_GROUP_ID,
-                                       text=msg_text,
-                                       reply_markup=_kb.as_markup(),
-                                       disable_web_page_preview=True)
+            #     await bot.send_message(chat_id=NEW_GROUP_ID,
+            #                            text=msg_text,
+            #                            reply_markup=_kb.as_markup(),
+            #                            disable_web_page_preview=True)
+            # else:
+            if guest.tg_id == 686339126:
+                _disable_notification = True
             else:
-                await bot.send_message(chat_id=MODER_CHANNEL_ID,
-                                       text=msg_text,
-                                       disable_web_page_preview=True)
+                disable_notification = False
+            await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                                    text=msg_text,
+                                    disable_notification=_disable_notification,
+                                    disable_web_page_preview=True)
         except Exception as ex:
             print('Ошибка при отправке уведолмения в бота уведолмений')
             print(ex)
