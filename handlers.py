@@ -316,8 +316,8 @@ async def test_send(user_id: int,
         try:
             NEW_GROUP_ID = '-4667981929'
             
+            _kb = create_confirm_swift_sepa_kb(order_id)
             # if guest.tg_id == 686339126:
-            #     _kb = create_confirm_swift_sepa_kb(order_id)
 
             #     await bot.send_message(chat_id=NEW_GROUP_ID,
             #                            text=msg_text,
@@ -327,10 +327,11 @@ async def test_send(user_id: int,
             if guest.tg_id == 686339126:
                 _disable_notification = True
             else:
-                disable_notification = False
+                _disable_notification = False
             await bot.send_message(chat_id=MODER_CHANNEL_ID,
                                     text=msg_text,
                                     disable_notification=_disable_notification,
+                                    reply_markup=_kb.as_markup(),
                                     disable_web_page_preview=True)
         except Exception as ex:
             print('Ошибка при отправке уведолмения в бота уведолмений')
