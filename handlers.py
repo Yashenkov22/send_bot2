@@ -309,13 +309,22 @@ async def test_send(user_id: int,
             chat_link = guest.chat_link
             # print(el.time_create)
             time_create = el.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
+    #         el_form = f'''
+    # Время создания: {time_create}\r
+    # Тип заявки: {el.request_type}\r
+    # Пользователь: {el.guest_id}\r
+    # Комментарий: {el.comment}\r
+    # Ссылка на заявку в <a href="https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/">django admin</a>
+    # ''' 
             el_form = f'''
     Время создания: {time_create}\r
     Тип заявки: {el.request_type}\r
     Пользователь: {el.guest_id}\r
     Комментарий: {el.comment}\r
-    Ссылка на заявку в <a href="https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/">django admin</a>
+    Ссылка на заявку в django admin👇🏼 \r
+    ( https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/ )
     ''' 
+
             # print(el.__dict__)
             if chat_link:
                 el_form += f'\rСсылка на чат по этому вопросу: {chat_link}\n'
