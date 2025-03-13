@@ -178,7 +178,8 @@ async def swift_confirm(callback: types.CallbackQuery,
                 bot: Bot,
                 text_msg: str = None):
     print('inside')
-    MODER_CHANNEL_ID = '-1002435890346'
+    # MODER_CHANNEL_ID = '-1002435890346'
+    NEW_GROUP_ID = '-4667981929'
 
     message_text = callback.message.text
     message_id = callback.message.message_id
@@ -224,7 +225,7 @@ async def swift_confirm(callback: types.CallbackQuery,
                                 timeout=timeout) as response:
                 response_json: dict = await response.json()
         
-        print(response_json)
+        print('response_json', response_json)
         _status = response_json.get('status')
 
         if _status == 'success':
@@ -252,7 +253,7 @@ async def swift_confirm(callback: types.CallbackQuery,
     new_message_text = message_text + sub_text
 
     await bot.edit_message_text(text=new_message_text,
-                                chat_id=MODER_CHANNEL_ID,
+                                chat_id=NEW_GROUP_ID,
                                 message_id=message_id,
                                 reply_markup=None,
                                 disable_web_page_preview=True)
