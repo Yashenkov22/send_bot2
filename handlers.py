@@ -179,10 +179,12 @@ async def swift_confirm(callback: types.CallbackQuery,
                 text_msg: str = None):
     print('inside')
     MODER_CHANNEL_ID = '-1002435890346'
-    # NEW_GROUP_ID = '-4667981929'
+    NEW_GROUP_ID = '-4667981929'
 
     message_text = callback.message.text
     message_id = callback.message.message_id
+
+    print('MESSAGE TEXT', message_text)
 
     callback_data = callback.data.split('_')
 
@@ -252,11 +254,18 @@ async def swift_confirm(callback: types.CallbackQuery,
     
     new_message_text = message_text + sub_text
 
-    await bot.edit_message_text(text=new_message_text,
-                                chat_id=MODER_CHANNEL_ID,
-                                message_id=message_id,
-                                reply_markup=None,
-                                disable_web_page_preview=True)
+    if _guest_id == 686339126:
+        await bot.edit_message_text(text=new_message_text,
+                                    chat_id=NEW_GROUP_ID,
+                                    message_id=message_id,
+                                    reply_markup=None,
+                                    disable_web_page_preview=True)
+    else:
+        await bot.edit_message_text(text=new_message_text,
+                                    chat_id=MODER_CHANNEL_ID,
+                                    message_id=message_id,
+                                    reply_markup=None,
+                                    disable_web_page_preview=True)
 
 
 async def test_send(user_id: int,
