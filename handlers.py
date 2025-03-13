@@ -261,11 +261,17 @@ async def swift_confirm(callback: types.CallbackQuery,
     #                                 reply_markup=None,
     #                                 disable_web_page_preview=True)
     # else:
-    await bot.edit_message_text(text=new_message_text,
-                                chat_id=MODER_CHANNEL_ID,
-                                message_id=message_id,
-                                reply_markup=None,
-                                disable_web_page_preview=True)
+    try:
+        await bot.edit_message_text(text=new_message_text,
+                                    chat_id=MODER_CHANNEL_ID,
+                                    message_id=message_id,
+                                    reply_markup=None,
+                                    disable_web_page_preview=True)
+    except Exception as ex:
+        print(ex)
+        pass
+    
+    await callback.answer()
 
 
 async def test_send(user_id: int,
