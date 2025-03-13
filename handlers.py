@@ -254,18 +254,18 @@ async def swift_confirm(callback: types.CallbackQuery,
     
     new_message_text = message_text + sub_text
 
-    if _guest_id == 686339126:
-        await bot.edit_message_text(text=new_message_text,
-                                    chat_id=NEW_GROUP_ID,
-                                    message_id=message_id,
-                                    reply_markup=None,
-                                    disable_web_page_preview=True)
-    else:
-        await bot.edit_message_text(text=new_message_text,
-                                    chat_id=MODER_CHANNEL_ID,
-                                    message_id=message_id,
-                                    reply_markup=None,
-                                    disable_web_page_preview=True)
+    # if _guest_id == 686339126:
+    #     await bot.edit_message_text(text=new_message_text,
+    #                                 chat_id=NEW_GROUP_ID,
+    #                                 message_id=message_id,
+    #                                 reply_markup=None,
+    #                                 disable_web_page_preview=True)
+    # else:
+    await bot.edit_message_text(text=new_message_text,
+                                chat_id=MODER_CHANNEL_ID,
+                                message_id=message_id,
+                                reply_markup=None,
+                                disable_web_page_preview=True)
 
 
 async def test_send(user_id: int,
