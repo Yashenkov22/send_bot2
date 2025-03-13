@@ -223,7 +223,8 @@ async def swift_confirm(callback: types.CallbackQuery,
             async with _session.get(_url,
                                 timeout=timeout) as response:
                 response_json: dict = await response.json()
-            
+        
+        print(response_json)
         _status = response_json.get('status')
 
         if _status == 'success':
