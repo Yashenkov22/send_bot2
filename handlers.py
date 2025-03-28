@@ -326,6 +326,7 @@ async def test_send(user_id: int,
     Время создания: {time_create}\r
     Тип заявки: {el.request_type}\r
     Пользователь: {el.guest_id}\r
+    Сумма: {el.amount}\r
     Комментарий: {el.comment}\r
     Ссылка на заявку в django admin👇🏼 \r
     https://api.moneyswap.online/django/admin/general_models/customorder/{el.id}/change/
