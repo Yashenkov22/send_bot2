@@ -250,6 +250,38 @@ async def swift_confirm(callback: types.CallbackQuery,
 
     elif confirm_marker == 'reject':
         sub_text = '\n\n<b><i>Заявка отклонена❌</i></b>'
+        
+        CustomOrder = Base.classes.general_models_customorder
+        Guest = Base.classes.general_models_guest
+
+        query = (
+            select(
+                CustomOrder.id,
+                Guest.tg_id,
+            )\
+            .join(Guest,
+                CustomOrder.guest_id == Guest.tg_id)\
+            .where(
+                or_(
+                    CustomOrder.id == order_id,
+                    )
+            )\
+            .order_by(CustomOrder.time_create.asc())\
+        )
+
+        with session as session:
+            res = session.execute(query)
+
+            res = res.fetchall()
+
+        _order_id, _guest_id = res[0]
+
+        _url = f'https://api.moneyswap.online/test_swift_sepa?user_id={_guest_id}&order_id={_order_id}&order_status={confirm_marker}'
+        timeout = aiohttp.ClientTimeout(total=5)
+        async with aiohttp.ClientSession() as _session:
+            async with _session.get(_url,
+                                timeout=timeout) as response:
+                pass
         # pass
     
     new_message_text = message_text + sub_text
