@@ -445,6 +445,52 @@ async def test_send(user_id: int,
             print(ex)
 
 
+async def send_review(review_id: int,
+                      marker: str,
+                      session: Session,
+                      bot: Bot):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    match marker:
+        case 'no_cash':
+            Review = Base.classes.no_cash_review
+            admin_page = 'no_cash'
+        case 'cash':
+            Review = Base.classes.cash_review
+            admin_page = 'cash'
+        case 'partner':
+            Review = Base.classes.partners_review
+            admin_page = 'partners'
+    
+    query = (
+        select(
+            Review
+        )\
+        .where(
+            Review.id == review_id
+            )
+    )
+
+    res = session.execute(query)
+
+    review = res.scalar_one_or_none()
+
+    if review:
+        msg_text = '📝<b>Новый отзыв, ожидающий модерации:</b>\n\n'
+        time_create = review.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
+
+        review_form = f'''
+    Время создания: {time_create}\r
+    Пользователь: {review.username}\r
+    Ссылка на заявку в django admin👇🏼\r
+    https://api.moneyswap.online/django/admin/{admin_page}/review/{review.id}/change/
+    '''
+        msg_text += review_form
+
+        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                               text=msg_text)
+
+
 async def result_chat_link(result_text: str,
                            bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
