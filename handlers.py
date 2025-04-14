@@ -481,7 +481,7 @@ async def send_review(review_id: int,
 
         review_form = f'''
     Время создания: {time_create}\r
-    Пользователь: {review.username}\r
+    
     Ссылка на заявку в django admin👇🏼\r
     https://api.moneyswap.online/django/admin/{admin_page}/review/{review.id}/change/
     '''
