@@ -451,6 +451,9 @@ async def send_review(review_id: int,
                       bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
 
+    if marker == 'both':
+        marker = 'no_cash'
+
     match marker:
         case 'no_cash':
             Review = Base.classes.no_cash_review
