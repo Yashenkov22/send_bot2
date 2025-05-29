@@ -547,7 +547,7 @@ async def send_comment(comment_id: int,
             )\
             .where(
                 and_(
-                    ExchangeAdmin.user_id == comment.user_id,
+                    ExchangeAdmin.user_id == comment.guest_id,
                     ExchangeAdmin.exchange_marker == marker,
                     ExchangeAdmin.exchange_id == exchange.id,
                 )
