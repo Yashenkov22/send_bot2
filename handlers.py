@@ -543,7 +543,7 @@ async def send_comment(comment_id: int,
 
         check_on_admin_query = (
             select(
-                ExchangeAdmin.name
+                ExchangeAdmin.exchange_name
             )\
             .where(
                 and_(
