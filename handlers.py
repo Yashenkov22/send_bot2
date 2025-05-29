@@ -16,7 +16,7 @@ from aiogram.fsm.context import FSMContext
 from pyrogram import Client
 
 from sqlalchemy.orm import Session, joinedload, sessionmaker
-from sqlalchemy import insert, select, update, or_
+from sqlalchemy import and_, insert, select, update, or_
 
 from config import BEARER_TOKEN, FEEDBACK_REASON_PREFIX
 
@@ -489,6 +489,90 @@ async def send_review(review_id: int,
     https://api.moneyswap.online/django/admin/{admin_page}/review/{review.id}/change/
     '''
         msg_text += review_form
+
+        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                               text=msg_text)
+        
+
+async def send_comment(comment_id: int,
+                      marker: str,
+                      session: Session,
+                      bot: Bot):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    if marker == 'both':
+        marker = 'no_cash'
+
+    match marker:
+        case 'no_cash':
+            Comment = Base.classes.no_cash_comment
+            Exchange = Base.classes.no_cash_exchange
+            Review = Base.classes.no_cash_review
+            admin_page = 'no_cash'
+        case 'cash':
+            Comment = Base.classes.cash_comment
+            Exchange = Base.classes.cash_exchange
+            Review = Base.classes.cash_review
+            admin_page = 'cash'
+        case 'partner':
+            Comment = Base.classes.partners_comment
+            Exchange = Base.classes.partners_exchange
+            Review = Base.classes.partners_review
+            admin_page = 'partners'
+    
+    query = (
+        select(
+            Comment,
+            Exchange,
+        )\
+        .join(Review,
+              Comment.review_id == Review.id)\
+        .join(Exchange,
+              Review.exchange_id == Exchange.id)\
+        .where(Comment.id == comment_id)
+    )
+
+    res = session.execute(query)
+
+    res_comment = res.fetchall()
+
+    if res_comment:
+        comment, exchange = res_comment
+
+        ExchangeAdmin = Base.classes.general_models_exchangeadmin
+
+        check_on_admin_query = (
+            select(
+                ExchangeAdmin.name
+            )\
+            .where(
+                and_(
+                    ExchangeAdmin.user_id == comment.user_id,
+                    ExchangeAdmin.exchange_marker == marker,
+                    ExchangeAdmin.exchange_id == exchange.id,
+                )
+            )
+        )
+
+        res = session.execute(check_on_admin_query)
+
+        admin_res = res.scalar_one_or_none()
+
+        if admin_res:
+            sub_text = f'комментарий администрации на обменник {admin_res}'
+        else:
+            sub_text = f'комментарий'
+
+        msg_text = f'📝<b>Новый {sub_text}, ожидающий модерации:</b>\n\n'
+        time_create = comment.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
+
+        comment_form = f'''
+    Время создания: {time_create}\r
+    
+    Ссылка на заявку в django admin👇🏼\r
+    https://api.moneyswap.online/django/admin/{admin_page}/comment/{comment.id}/change/
+    '''
+        msg_text += comment_form
 
         await bot.send_message(chat_id=MODER_CHANNEL_ID,
                                text=msg_text)
