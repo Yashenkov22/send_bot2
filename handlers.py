@@ -537,7 +537,7 @@ async def send_comment(comment_id: int,
     res_comment = res.fetchall()
 
     if res_comment:
-        comment, exchange = res_comment
+        comment, exchange = res_comment[0]
 
         ExchangeAdmin = Base.classes.general_models_exchangeadmin
 
