@@ -556,9 +556,10 @@ async def send_comment(comment_id: int,
 
         res = session.execute(check_on_admin_query)
 
-        admin_res = res.scalar_one_or_none()
+        admin_res = res.fetchall()
 
         if admin_res:
+            admin_res = admin_res[0][0]
             sub_text = f'комментарий администрации на обменник {admin_res}'
         else:
             sub_text = f'комментарий'
