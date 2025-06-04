@@ -446,24 +446,25 @@ async def test_send(user_id: int,
 
 
 async def send_review(review_id: int,
-                      marker: str,
                       session: Session,
                       bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
 
-    if marker == 'both':
-        marker = 'no_cash'
+    Review = Base.classes.general_models_newbasereview
 
-    match marker:
-        case 'no_cash':
-            Review = Base.classes.no_cash_review
-            admin_page = 'no_cash'
-        case 'cash':
-            Review = Base.classes.cash_review
-            admin_page = 'cash'
-        case 'partner':
-            Review = Base.classes.partners_review
-            admin_page = 'partners'
+    # if marker == 'both':
+    #     marker = 'no_cash'
+
+    # match marker:
+    #     case 'no_cash':
+    #         Review = Base.classes.no_cash_review
+    #         admin_page = 'no_cash'
+    #     case 'cash':
+    #         Review = Base.classes.cash_review
+    #         admin_page = 'cash'
+    #     case 'partner':
+    #         Review = Base.classes.partners_review
+    #         admin_page = 'partners'
     
     query = (
         select(
@@ -486,7 +487,7 @@ async def send_review(review_id: int,
     Время создания: {time_create}\r
     
     Ссылка на заявку в django admin👇🏼\r
-    https://api.moneyswap.online/django/admin/{admin_page}/review/{review.id}/change/
+    https://api.moneyswap.online/django/admin/general_models/newbasereview/{review_id}/change/
     '''
         msg_text += review_form
 
@@ -495,40 +496,40 @@ async def send_review(review_id: int,
         
 
 async def send_comment(comment_id: int,
-                      marker: str,
                       session: Session,
                       bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
 
-    if marker == 'both':
-        marker = 'no_cash'
+    Comment = Base.classes.general_models_newbasecomment
+    Review = Base.classes.general_models_newbasereview
 
-    match marker:
-        case 'no_cash':
-            Comment = Base.classes.no_cash_comment
-            Exchange = Base.classes.no_cash_exchange
-            Review = Base.classes.no_cash_review
-            admin_page = 'no_cash'
-        case 'cash':
-            Comment = Base.classes.cash_comment
-            Exchange = Base.classes.cash_exchange
-            Review = Base.classes.cash_review
-            admin_page = 'cash'
-        case 'partner':
-            Comment = Base.classes.partners_comment
-            Exchange = Base.classes.partners_exchange
-            Review = Base.classes.partners_review
-            admin_page = 'partners'
+    # if marker == 'both':
+    #     marker = 'no_cash'
+
+    # match marker:
+    #     case 'no_cash':
+    #         Comment = Base.classes.no_cash_comment
+    #         Exchange = Base.classes.no_cash_exchange
+    #         Review = Base.classes.no_cash_review
+    #         admin_page = 'no_cash'
+    #     case 'cash':
+    #         Comment = Base.classes.cash_comment
+    #         Exchange = Base.classes.cash_exchange
+    #         Review = Base.classes.cash_review
+    #         admin_page = 'cash'
+    #     case 'partner':
+    #         Comment = Base.classes.partners_comment
+    #         Exchange = Base.classes.partners_exchange
+    #         Review = Base.classes.partners_review
+    #         admin_page = 'partners'
     
     query = (
         select(
             Comment,
-            Exchange,
+            Review,
         )\
         .join(Review,
               Comment.review_id == Review.id)\
-        .join(Exchange,
-              Review.exchange_id == Exchange.id)\
         .where(Comment.id == comment_id)
     )
 
@@ -537,7 +538,7 @@ async def send_comment(comment_id: int,
     res_comment = res.fetchall()
 
     if res_comment:
-        comment, exchange = res_comment[0]
+        comment, review = res_comment[0]
 
         ExchangeAdmin = Base.classes.general_models_exchangeadmin
 
@@ -548,8 +549,7 @@ async def send_comment(comment_id: int,
             .where(
                 and_(
                     ExchangeAdmin.user_id == comment.guest_id,
-                    ExchangeAdmin.exchange_marker == marker,
-                    ExchangeAdmin.exchange_id == exchange.id,
+                    ExchangeAdmin.exchange_name == review.exchange_name,
                 )
             )
         )
@@ -570,7 +570,7 @@ async def send_comment(comment_id: int,
     Время создания: {time_create}\r
     
     Ссылка на заявку в django admin👇🏼\r
-    https://api.moneyswap.online/django/admin/{admin_page}/comment/{comment.id}/change/
+    https://api.moneyswap.online/django/admin/general_models/newbasecomment/{comment.id}/change/
     '''
         msg_text += comment_form
 

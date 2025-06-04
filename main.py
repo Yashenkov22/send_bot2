@@ -128,19 +128,15 @@ async def send_to_tg_group(user_id: int,
 
 
 @app.get('/send_to_tg_group_review')
-async def send_to_tg_group_review(review_id: int,
-                                  marker: str):
+async def send_to_tg_group_review(review_id: int):
     await send_review(review_id=review_id,
-                      marker=marker,
                       session=session(),
                       bot=bot)
 
 
 @app.get('/send_to_tg_group_comment')
-async def send_to_tg_group_comment(comment_id: int,
-                                   marker: str):
+async def send_to_tg_group_comment(comment_id: int):
     await send_comment(comment_id=comment_id,
-                       marker=marker,
                       session=session(),
                       bot=bot)
 
