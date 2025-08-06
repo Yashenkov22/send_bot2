@@ -333,8 +333,8 @@ async def test_send(user_id: int,
             .order_by(CustomOrder.time_create.asc())\
         )
 
-        with session as session:
-            res = session.execute(query)
+        with session as _session:
+            res = _session.execute(query)
 
             res = res.fetchall()
 
@@ -411,8 +411,8 @@ async def test_send(user_id: int,
             )
             .order_by(FeedbackForm.time_create.asc())\
         )
-        with session as session:
-            res = session.execute(query)
+        with session as _session:
+            res = _session.execute(query)
 
             res = res.scalars().all()
         
@@ -474,8 +474,8 @@ async def send_review(review_id: int,
             Review.id == review_id
             )
     )
-
-    res = session.execute(query)
+    with session as _session:
+        res = _session.execute(query)
 
     review = res.scalar_one_or_none()
 
@@ -532,8 +532,8 @@ async def send_comment(comment_id: int,
               Comment.review_id == Review.id)\
         .where(Comment.id == comment_id)
     )
-
-    res = session.execute(query)
+    with session as _session:
+        res = _session.execute(query)
 
     res_comment = res.fetchall()
 
@@ -553,8 +553,9 @@ async def send_comment(comment_id: int,
                 )
             )
         )
-
-        res = session.execute(check_on_admin_query)
+        
+        with session as _session:
+            res = session.execute(check_on_admin_query)
 
         admin_res = res.fetchall()
 
