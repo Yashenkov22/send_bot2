@@ -477,7 +477,7 @@ async def send_review(review_id: int,
     with session as _session:
         res = _session.execute(query)
 
-    review = res.scalar_one_or_none()
+        review = res.scalar_one_or_none()
 
     if review:
         msg_text = '📝<b>Новый отзыв, ожидающий модерации:</b>\n\n'
@@ -535,7 +535,7 @@ async def send_comment(comment_id: int,
     with session as _session:
         res = _session.execute(query)
 
-    res_comment = res.fetchall()
+        res_comment = res.fetchall()
 
     if res_comment:
         comment, review = res_comment[0]
@@ -557,7 +557,7 @@ async def send_comment(comment_id: int,
         with session as _session:
             res = session.execute(check_on_admin_query)
 
-        admin_res = res.fetchall()
+            admin_res = res.fetchall()
 
         if admin_res:
             admin_res = admin_res[0][0]
