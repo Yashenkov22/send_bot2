@@ -614,7 +614,7 @@ async def test_send_info(execute_time,
                     bot: Bot):
     MODER_CHANNEL_ID = '-1002435890346'
 
-    msg_text = f'Массовая рассылка завершена\n\nВремя выполнения: {execute_time}\n\nНачальное число активных пользователей: {start_users_count}\n\Конечное число активных пользователей: {end_users_count}'
+    msg_text = f'Массовая рассылка завершена\n\nВремя выполнения: {execute_time}\n\nНачальное число активных пользователей: {start_users_count}\n\nКонечное число активных пользователей: {end_users_count}'
 
     await bot.send_message(chat_id=MODER_CHANNEL_ID,
                            text=msg_text,
