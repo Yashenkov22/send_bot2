@@ -13,6 +13,7 @@ from pyrogram import Client
 from starlette.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, APIRouter
+from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -32,8 +33,13 @@ from config import (TOKEN,
                     API_HASH,
                     REDIS_HOST,
                     REDIS_PASSWORD)
-from handlers import (main_router, send_comment,
-                      send_mass_message, send_review, test_result_chat_link,
+from handlers import (main_router,
+                      new_send_comment,
+                      new_send_review,
+                      send_comment,
+                      send_mass_message,
+                      send_review,
+                      test_result_chat_link,
                       test_send,
                       test_send_info,
                       result_chat_link)
@@ -100,7 +106,21 @@ WEBHOOK_PATH = f'/webhook_send'
 #                           drop_pending_updates=True,
 #                           allowed_updates=['message', 'callback_query'])
     
+#     Base.prepare(engine, reflect=True)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Код, который будет выполнен при старте приложения
+    print("Приложение запускается...")
+    await bot.set_webhook(f"{PUBLIC_URL}{WEBHOOK_PATH}",
+                          allowed_updates=['message', 'callback_query'])
+                        #   drop_pending_updates=True,
+
     # Base.prepare(engine, reflect=True)
+    yield  # Это место, где приложение будет работать
+    # Код, который будет выполнен при остановке приложения
+    await bot.delete_webhook()
+    print("Приложение останавливается...")
 
 
 #Endpoint for checking
@@ -132,11 +152,25 @@ async def send_to_tg_group_review(review_id: int):
     await send_review(review_id=review_id,
                       session=session(),
                       bot=bot)
+    
+
+@app.get('/new_send_to_tg_group_review')
+async def new_send_to_tg_group_review(review_id: int):
+    await new_send_review(review_id=review_id,
+                      session=session(),
+                      bot=bot)
 
 
 @app.get('/send_to_tg_group_comment')
 async def send_to_tg_group_comment(comment_id: int):
     await send_comment(comment_id=comment_id,
+                      session=session(),
+                      bot=bot)
+    
+
+@app.get('/new_send_to_tg_group_comment')
+async def new_send_to_tg_group_comment(comment_id: int):
+    await new_send_comment(comment_id=comment_id,
                       session=session(),
                       bot=bot)
 

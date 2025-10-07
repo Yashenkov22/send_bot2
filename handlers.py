@@ -495,6 +495,43 @@ async def send_review(review_id: int,
                                text=msg_text)
         
 
+async def new_send_review(review_id: int,
+                          session: Session,
+                          bot: Bot):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    Review = Base.classes.general_models_review
+    
+    query = (
+        select(
+            Review
+        )\
+        .where(
+            Review.id == review_id
+            )
+    )
+    with session as _session:
+        res = _session.execute(query)
+
+        review = res.scalar_one_or_none()
+
+    if review:
+        msg_text = '📝<b>Новый отзыв, ожидающий модерации (редизайн):</b>\n\n'
+        time_create = review.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
+
+        review_form = f'''
+    Время создания: {time_create}\r
+    
+    Ссылка на заявку в django admin👇🏼\r
+    https://api.moneyswap.online/django/admin/general_models/review/{review_id}/change/
+    '''
+        msg_text += review_form
+
+        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                               text=msg_text)
+
+        
+
 async def send_comment(comment_id: int,
                       session: Session,
                       bot: Bot):
@@ -578,6 +615,76 @@ async def send_comment(comment_id: int,
 
         await bot.send_message(chat_id=MODER_CHANNEL_ID,
                                text=msg_text)
+        
+
+async def new_send_comment(comment_id: int,
+                           session: Session,
+                           bot: Bot):
+    MODER_CHANNEL_ID = '-1002435890346'
+
+    Comment = Base.classes.general_models_comment
+    Review = Base.classes.general_models_review
+    
+    query = (
+        select(
+            Comment,
+            Review,
+        )\
+        .join(Review,
+              Comment.review_id == Review.id)\
+        .where(Comment.id == comment_id)
+    )
+    with session as _session:
+        res = _session.execute(query)
+
+        res_comment = res.fetchall()
+
+    if res_comment:
+        comment, review = res_comment[0]
+
+        ExchangeAdmin = Base.classes.general_models_newexchangeadmin
+        Exchange = Base.classes.general_models_exchanger
+
+        check_on_admin_query = (
+            select(
+                Exchange.name
+            )\
+            .select_from(ExchangeAdmin)\
+            .join(Exchange,
+                  ExchangeAdmin.exchange_id == Exchange.id)\
+            .where(
+                and_(
+                    ExchangeAdmin.user_id == comment.guest_id,
+                    ExchangeAdmin.exchange_id == review.exchange_id,
+                )
+            )
+        )
+        
+        with session as _session:
+            res = session.execute(check_on_admin_query)
+
+            admin_res = res.fetchall()
+
+        if admin_res:
+            admin_res = admin_res[0][0]
+            sub_text = f'комментарий администрации на обменник {admin_res}'
+        else:
+            sub_text = f'комментарий'
+
+        msg_text = f'📝<b>Новый {sub_text}, ожидающий модерации (редизайн):</b>\n\n'
+        time_create = comment.time_create.astimezone(moscow_tz).strftime('%d.%m.%Y %H:%M')
+
+        comment_form = f'''
+    Время создания: {time_create}\r
+    
+    Ссылка на заявку в django admin👇🏼\r
+    https://api.moneyswap.online/django/admin/general_models/comment/{comment.id}/change/
+    '''
+        msg_text += comment_form
+
+        await bot.send_message(chat_id=MODER_CHANNEL_ID,
+                               text=msg_text)
+
 
 
 async def result_chat_link(result_text: str,
