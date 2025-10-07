@@ -112,7 +112,8 @@ asyncio.set_event_loop(event_loop)
 config = Config(app=app,
                 loop=event_loop,
                 host='0.0.0.0',
-                port=8002)
+                port=8002,
+                lifespan="on")
 server = Server(config)
 
 
