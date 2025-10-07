@@ -76,8 +76,29 @@ dp.include_router(main_router)
 #Add session and database connection in handlers 
 dp.update.middleware(DbSessionMiddleware(session_pool=session))
 
+
+#For set webhook
+WEBHOOK_PATH = f'/webhook_send'
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Код, который будет выполнен при старте приложения
+    print("Приложение запускается...")
+    await bot.set_webhook(f"{PUBLIC_URL}{WEBHOOK_PATH}",
+                          allowed_updates=['message', 'callback_query'])
+                        #   drop_pending_updates=True,
+
+    # Base.prepare(engine, reflect=True)
+    yield  # Это место, где приложение будет работать
+    # Код, который будет выполнен при остановке приложения
+    await bot.delete_webhook()
+    print("Приложение останавливается...")
+
+
 #Initialize web server
-app = FastAPI(docs_url='/docs_send')
+app = FastAPI(docs_url='/docs_send',
+              lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -98,8 +119,6 @@ server = Server(config)
 fast_api_router = APIRouter(prefix='/bot_api')
 # app.include_router(fast_api_router)
 
-#For set webhook
-WEBHOOK_PATH = f'/webhook_send'
 
 #Set webhook and create database on start
 # @app.on_event('startup')
@@ -110,19 +129,7 @@ WEBHOOK_PATH = f'/webhook_send'
     
 #     Base.prepare(engine, reflect=True)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Код, который будет выполнен при старте приложения
-    print("Приложение запускается...")
-    await bot.set_webhook(f"{PUBLIC_URL}{WEBHOOK_PATH}",
-                          allowed_updates=['message', 'callback_query'])
-                        #   drop_pending_updates=True,
 
-    # Base.prepare(engine, reflect=True)
-    yield  # Это место, где приложение будет работать
-    # Код, который будет выполнен при остановке приложения
-    await bot.delete_webhook()
-    print("Приложение останавливается...")
 
 
 #Endpoint for checking
