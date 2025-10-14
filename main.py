@@ -1,14 +1,6 @@
 import asyncio
 
-import redis
-
-import uvicorn
-
-import redis.asyncio
-import redis.asyncio.client
 from uvicorn import Config, Server
-
-from pyrogram import Client
 
 from starlette.middleware.cors import CORSMiddleware
 
@@ -16,13 +8,8 @@ from fastapi import FastAPI, APIRouter
 from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
 
-from sqlalchemy.engine import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-
-from db.base import engine, session, Base
+from db.base import engine, async_session_maker, Base, init_models
 
 from middlewares.db import DbSessionMiddleware
 
@@ -37,7 +24,6 @@ from handlers import (main_router,
                       new_send_comment,
                       new_send_review,
                       send_comment,
-                      send_mass_message,
                       send_review,
                       test_result_chat_link,
                       test_send,
@@ -45,36 +31,15 @@ from handlers import (main_router,
                       result_chat_link)
 
 
-###DEV###
-
-#DATABASE
-# engine = create_engine(db_url,
-#                        echo=True)
-
-# Base.prepare(engine, reflect=True)
-
-# session = sessionmaker(engine, expire_on_commit=False)
-
-#Initialize Redis storage
-# redis_client = redis.asyncio.client.Redis(host=REDIS_HOST,
-#                                           password=REDIS_PASSWORD)
-# storage = RedisStorage(redis=redis_client)
-
-
 #TG BOT
 bot = Bot(TOKEN, parse_mode="HTML")
 
-#####
-# api_client = Client('my_account',
-#                     api_id=API_ID,
-#                     api_hash=API_HASH)
-#####
 
 dp = Dispatcher()
 dp.include_router(main_router)
 
 #Add session and database connection in handlers 
-dp.update.middleware(DbSessionMiddleware(session_pool=session))
+dp.update.middleware(DbSessionMiddleware(session_pool=async_session_maker))
 
 
 #For set webhook
@@ -89,9 +54,9 @@ async def lifespan(app: FastAPI):
                           allowed_updates=['message', 'callback_query'])
                         #   drop_pending_updates=True,
 
-    # Base.prepare(engine, reflect=True)
-    yield  # Это место, где приложение будет работать
-    # Код, который будет выполнен при остановке приложения
+    await init_models()
+    yield
+
     await bot.delete_webhook()
     print("Приложение останавливается...")
 
@@ -106,9 +71,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# event_loop = asyncio.get_event_loop()
+
 event_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(event_loop)
+
 config = Config(app=app,
                 loop=event_loop,
                 host='0.0.0.0',
@@ -116,22 +82,7 @@ config = Config(app=app,
                 lifespan="on")
 server = Server(config)
 
-
-fast_api_router = APIRouter(prefix='/bot_api')
-# app.include_router(fast_api_router)
-
-
-#Set webhook and create database on start
-# @app.on_event('startup')
-# async def on_startup():
-#     await bot.set_webhook(f"{PUBLIC_URL}{WEBHOOK_PATH}",
-#                           drop_pending_updates=True,
-#                           allowed_updates=['message', 'callback_query'])
-    
-#     Base.prepare(engine, reflect=True)
-
-
-
+# fast_api_router = APIRouter(prefix='/bot_api')
 
 #Endpoint for checking
 @app.get(WEBHOOK_PATH)
@@ -153,35 +104,35 @@ async def send_to_tg_group(user_id: int,
     await test_send(user_id=user_id,
                     order_id=order_id,
                     marker=marker,
-                    session=session(),
+                    session=async_session_maker(),
                     bot=bot)
 
 
 @app.get('/send_to_tg_group_review')
 async def send_to_tg_group_review(review_id: int):
     await send_review(review_id=review_id,
-                      session=session(),
+                      session=async_session_maker(),
                       bot=bot)
     
 
 @app.get('/new_send_to_tg_group_review')
 async def new_send_to_tg_group_review(review_id: int):
     await new_send_review(review_id=review_id,
-                      session=session(),
+                      session=async_session_maker(),
                       bot=bot)
 
 
 @app.get('/send_to_tg_group_comment')
 async def send_to_tg_group_comment(comment_id: int):
     await send_comment(comment_id=comment_id,
-                      session=session(),
+                      session=async_session_maker(),
                       bot=bot)
     
 
 @app.get('/new_send_to_tg_group_comment')
 async def new_send_to_tg_group_comment(comment_id: int):
     await new_send_comment(comment_id=comment_id,
-                      session=session(),
+                      session=async_session_maker(),
                       bot=bot)
 
 
@@ -204,7 +155,7 @@ async def send_mass_message_info(execute_time,
     await test_send_info(execute_time=execute_time,
                     start_users_count=start_users_count,
                     end_users_count=end_users_count,
-                    session=session(),
+                    session=async_session_maker(),
                     bot=bot)
 #Endpoint for mass send message
 # @app.get('/send_mass_message')
