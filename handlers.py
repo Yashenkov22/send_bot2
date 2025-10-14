@@ -51,7 +51,7 @@ async def swift_confirm(callback: types.CallbackQuery,
 
     confirm_marker = callback_data[1]
 
-    order_id = callback_data[-1]
+    order_id = int(callback_data[-1])
 
     sub_text = '\n\n Ничего не произошло (вероятно пользователь заблокировал бота)😔'
 
