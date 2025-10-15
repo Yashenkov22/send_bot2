@@ -24,11 +24,19 @@ from config import db_url, async_db_url
 Base = automap_base()
 
 # Создаём асинхронный движок
+# engine = create_async_engine(
+#     async_db_url,
+#     connect_args={"statement_cache_size": 0},
+#     echo=True,
+#     future=True
+# )
+
 engine = create_async_engine(
     async_db_url,
-    connect_args={"statement_cache_size": 0},
-    echo=True,
-    future=True
+    pool_size=10,          # число постоянных соединений в пуле
+    max_overflow=20,       # доп. соединения при пиках нагрузки
+    pool_timeout=30,       # таймаут ожидания соединения
+    echo=True,            # можно поставить True для логов SQL
 )
 
 # Асинхронная сессия
