@@ -26,6 +26,7 @@ Base = automap_base()
 # Создаём асинхронный движок
 engine = create_async_engine(
     async_db_url,
+    connect_args={"statement_cache_size": 0},
     echo=True,
     future=True
 )
